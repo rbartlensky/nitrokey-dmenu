@@ -1,7 +1,13 @@
 [package]
+authors = ["Robert Bartlensky <bartlensky.robert@gmail.com>"]
 name = "nitrokey-dmenu"
 version = "0.1.0"
 edition = "2021"
+description = "Quickly fetch passwords from your nitrokey"
+readme = "./README.md"
+repository = "https://github.com/rbartlensky/nitrokey-dmenu"
+license = "GPL-3.0"
+keywords = ["nitrokey", "dmenu"]
 
 [dependencies]
 anyhow = "1.0"
