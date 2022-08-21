@@ -1,0 +1,11 @@
+[package]
+name = "nitrokey-dmenu"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+copypasta = "0.8"
+nitrokey = "0.9"
+pinentry = "0.5"
+secrecy = "0.8"
