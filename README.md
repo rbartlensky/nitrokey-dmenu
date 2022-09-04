@@ -11,4 +11,8 @@ The app will:
 
 ## Install
 
-Simply run `cargo install <repo-url>`.
+Run `cargo install nitrokey-dmenu`.
+
+### Linking against your system's `libnitrokey`
+
+Before running `cargo install` you can set `USE_SYSTEM_LIBNITROKEY=1`.
