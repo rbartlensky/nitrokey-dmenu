@@ -50,7 +50,10 @@ fn main() -> anyhow::Result<()> {
     r
 }
 
-fn show_dmenu(device: &mut nitrokey::DeviceWrapper, data: &secrecy::SecretString) -> anyhow::Result<()> {
+fn show_dmenu(
+    device: &mut nitrokey::DeviceWrapper,
+    data: &secrecy::SecretString,
+) -> anyhow::Result<()> {
     let safe = device.get_password_safe(data.expose_secret())?;
     let r = slots(&safe);
     if let Ok(slots) = &r {
