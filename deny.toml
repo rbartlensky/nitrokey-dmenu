@@ -4,20 +4,25 @@ db-urls = ["https://github.com/rustsec/advisory-db"]
 vulnerability = "deny"
 unmaintained = "deny"
 yanked = "deny"
-notice = "warn"
+notice = "deny"
+ignore = [
+    "RUSTSEC-2020-0097",
+    # hopefully xml-rs will be maintained soon: https://github.com/netvl/xml-rs/issues/221
+    "RUSTSEC-2022-0048",
+]
 
 [licenses]
 unlicensed = "deny"
-# List of explicitly allowed licenses
-# See https://spdx.org/licenses/ for list of possible licenses
-# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
 allow = [
     "Apache-2.0 WITH LLVM-exception",
     "Apache-2.0",
     "BSD-2-Clause",
     "BSD-3-Clause",
+    "BSL-1.0",
     "CC0-1.0",
+    "ISC",
     "MIT",
+    "Unicode-DFS-2016",
 ]
 copyleft = "allow"
 allow-osi-fsf-free = "neither"
