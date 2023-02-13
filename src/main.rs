@@ -3,34 +3,35 @@ use copypasta::{ClipboardContext, ClipboardProvider};
 use nitrokey::{Device, GetPasswordSafe, PasswordSafe};
 use pinentry::PassphraseInput;
 use secrecy::ExposeSecret;
-use std::{
-    collections::HashMap, io::Write, process::Command, process::Stdio, thread::sleep,
-    time::Duration,
-};
+use std::{io::Write, process::Command, process::Stdio, str, thread::sleep, time::Duration};
 
-fn slots(safe: &PasswordSafe) -> anyhow::Result<HashMap<String, u8>> {
-    let mut slots = HashMap::new();
-    for (i, slot) in safe.get_slots()?.iter().enumerate() {
-        if let Some(slot) = *slot {
-            slots.insert(slot.get_name()?, i as u8);
-        }
-    }
-    Ok(slots)
+fn slots(safe: &PasswordSafe) -> anyhow::Result<Vec<Option<String>>> {
+    safe.get_slots()?
+        .into_iter()
+        .map(|slot| slot.map(|slot| slot.get_name()).transpose())
+        .collect::<Result<_, _>>()
+        .map_err(anyhow::Error::from)
 }
 
-fn dmenu(choices: &[String]) -> anyhow::Result<String> {
+fn dmenu(choices: &[Option<String>]) -> anyhow::Result<usize> {
     let mut dmenu = Command::new("dmenu").stdin(Stdio::piped()).stdout(Stdio::piped()).spawn()?;
     dmenu
         .stdin
         .as_mut()
         .ok_or_else(|| anyhow!("failed to get stdin of 'dmenu'"))?
-        .write_all(choices.join("\n").as_bytes())?;
+        .write_all(choices.iter().flatten().cloned().collect::<Vec<_>>().join("\n").as_bytes())?;
     let output = dmenu.wait_with_output()?;
     if !output.status.success() {
         bail!("'dmenu' exited with {}", output.status);
     }
-    let choice = String::from_utf8(output.stdout)?;
-    Ok(choice.trim_end_matches('\n').into())
+
+    let choice = str::from_utf8(&output.stdout)?.trim_end_matches('\n');
+
+    choices
+        .iter()
+        .enumerate()
+        .find_map(|(i, slot)| slot.as_ref().map(|s| s == choice).unwrap_or_default().then_some(i))
+        .ok_or_else(|| anyhow!("selected choice not found in store"))
 }
 
 fn main() -> anyhow::Result<()> {
@@ -55,15 +56,13 @@ fn show_dmenu(
     data: &secrecy::SecretString,
 ) -> anyhow::Result<()> {
     let safe = device.get_password_safe(data.expose_secret())?;
-    let r = slots(&safe);
-    if let Ok(slots) = &r {
-        let mut choices = slots.iter().map(|(s, _)| s.into()).collect::<Vec<String>>();
-        choices.sort();
-        let choice = dmenu(&choices)?;
-        let pw = safe.get_slot(slots[&choice])?.get_password()?;
-        let mut ctx = ClipboardContext::new().unwrap();
-        ctx.set_contents(pw).map_err(|e| anyhow!("failed to copy password to clipboard: {}", e))?;
-        sleep(Duration::from_secs(5));
-    }
-    r.map(|_| ())
+
+    let choices = slots(&safe)?;
+    let choice = dmenu(&choices)?;
+    let pw = safe.get_slot(choice as u8)?.get_password()?;
+    let mut ctx = ClipboardContext::new().unwrap();
+    ctx.set_contents(pw).map_err(|e| anyhow!("failed to copy password to clipboard: {}", e))?;
+    sleep(Duration::from_secs(5));
+
+    Ok(())
 }
