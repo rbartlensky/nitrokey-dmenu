@@ -10,7 +10,7 @@ license = "GPL-3.0"
 keywords = ["nitrokey", "dmenu"]
 
 [dependencies]
-anyhow = "1.0"
+anyhow = "1"
 copypasta = "0.8"
 nitrokey = "0.9"
 pinentry = "0.5"
