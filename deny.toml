@@ -5,20 +5,14 @@ vulnerability = "deny"
 unmaintained = "deny"
 yanked = "deny"
 notice = "deny"
-ignore = [
-    # hopefully xml-rs will be maintained soon: https://github.com/netvl/xml-rs/issues/221
-    "RUSTSEC-2022-0048",
-]
+ignore = []
 
 [licenses]
 unlicensed = "deny"
 allow = [
     "Apache-2.0 WITH LLVM-exception",
     "Apache-2.0",
-    "BSD-2-Clause",
-    "BSD-3-Clause",
     "BSL-1.0",
-    "CC0-1.0",
     "ISC",
     "MIT",
     "Unicode-DFS-2016",

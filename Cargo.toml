@@ -11,7 +11,7 @@ keywords = ["nitrokey", "dmenu"]
 
 [dependencies]
 anyhow = "1"
-copypasta = "0.8"
+copypasta = "0.10"
 nitrokey = "0.9"
 pinentry = "0.5"
 secrecy = "0.8"
